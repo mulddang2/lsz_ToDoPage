@@ -3,9 +3,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { TBoard } from '../types/board';
 import { TTodo } from '../types/todo';
 import { persist } from 'zustand/middleware';
-
-type BoardStore = {
+interface BoardStore {
   boardList: TBoard[];
+}
+
+interface Actions {
   addBoard: (name: string) => void;
   addTodo: (boardId: string, content: string) => void;
   removeBoard: (boardId: string) => void;
@@ -19,10 +21,10 @@ type BoardStore = {
     dragTodoId: string,
     dropTodoIndex: number
   ) => void;
-};
+}
 
 export const useBoardStore = create(
-  persist<BoardStore>(
+  persist<BoardStore & Actions>(
     (set) => ({
       boardList: [],
       addBoard: (name: string) =>
@@ -181,7 +183,7 @@ export const useBoardStore = create(
       },
     }),
     {
-      name: 'board-store', 
+      name: 'board-store',
     }
   )
 );
