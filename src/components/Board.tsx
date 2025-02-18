@@ -64,7 +64,7 @@ export default function Board({ board, index }: BoardProps) {
         drag(drop(node));
       }}
       key={board.id}
-      className={`cursor-move grid grid-rows-[auto_1fr_auto] bg-gray-100 p-3 w-96 ${
+      className={`cursor-move grid grid-rows-[auto_1fr_auto] bg-gray-100 p-3 w-96 min-h-96 ${
         isDragging ? 'opacity-50' : 'opacity-100'
       }`}
     >
