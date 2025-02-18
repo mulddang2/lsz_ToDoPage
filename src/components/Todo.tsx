@@ -4,6 +4,7 @@ import { MdOutlineCancelPresentation, MdOutlineEdit } from 'react-icons/md';
 import { useBoardStore } from '../stores/useBoardStore';
 import { ItemTypes } from './Board';
 import { useDrag, useDrop } from 'react-dnd';
+import { isNullOrEmpty } from '../util/stringUtil';
 
 interface ITodo {
   todo: TTodo;
@@ -15,9 +16,9 @@ export default function Todo({ todo, index, boardId }: ITodo) {
   const { removeTodo, editTodo, moveTodo } = useBoardStore();
 
   const handleEditTodo = (boardId: string, todoId: string) => {
-    const newContent = prompt('변경할 할 일을 입력해주세요.');
-    if (!newContent) {
-      alert('잘못된 할 일 입니다.');
+    const newContent = prompt('변경할 할 일을 입력해주세요.') || '';
+    if (isNullOrEmpty(newContent)) {
+      alert('할 일을 여백으로 변경할 수 없습니다.');
       return;
     }
     editTodo(boardId, todoId, newContent);
@@ -59,7 +60,11 @@ export default function Todo({ todo, index, boardId }: ITodo) {
       }`}
       key={todo.id}
     >
-      <h5>{todo.content}</h5>
+      <h5>
+        {typeof todo.content === 'string'
+          ? todo.content
+          : JSON.stringify(todo.content)}
+      </h5>
       <div className='flex gap-2 '>
         <MdOutlineEdit
           onClick={() => handleEditTodo(boardId, todo.id)}
