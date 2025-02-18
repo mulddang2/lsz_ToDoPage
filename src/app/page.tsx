@@ -9,15 +9,14 @@ import InputModal from '../components/InputModal';
 import { useBoardStore } from '../stores/useBoardStore';
 
 export default function Home() {
-  const { boardList, addBoard } = useBoardStore();
-
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { boardList, addBoard } = useBoardStore();
 
   return (
     <div className='p-10 min-h-screen'>
       {/* Board header */}
       <div className='flex items-center gap-2'>
-        <h4 className='text-4xl font-bold text-gray-600'>My board</h4>
+        <h4 className='text-4xl font-bold text-gray-600'>나의 보드</h4>
         <MdOutlineAddBox
           onClick={() => setIsModalOpen(true)}
           className='w-10 h-10 text-gray-500 cursor-pointer'

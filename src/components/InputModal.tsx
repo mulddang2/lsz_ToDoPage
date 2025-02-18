@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { isNullOrEmpty } from '../util/stringUtil';
 import ModalBg from './ModalBg';
 
 interface IInputModal {
   title: string;
   inputName: string;
+  inputDefaultValue?: string;
   isOpen: boolean;
   onSubmit: (content: string) => void;
   onClose: () => void;
@@ -13,13 +14,20 @@ interface IInputModal {
 export default function InputModal({
   title,
   inputName,
+  inputDefaultValue,
   isOpen,
   onSubmit,
   onClose,
 }: IInputModal) {
-  const [modalContent, setModalContent] = useState('');
+  const [modalContent, setModalContent] = useState(inputDefaultValue ?? '');
 
-  const saveTodoName = (e: {
+  useEffect(() => {
+    if (isOpen && inputDefaultValue !== undefined) {
+      setModalContent(inputDefaultValue);
+    }
+  }, [isOpen, inputDefaultValue]);
+
+  const onChangeContent = (e: {
     target: { value: React.SetStateAction<string> };
   }) => {
     setModalContent(e.target.value);
@@ -30,7 +38,7 @@ export default function InputModal({
   ) => {
     e.preventDefault();
     if (isNullOrEmpty(modalContent)) {
-      alert('목록을 비워둘 수 없습니다.');
+      alert('내용을 입력해주세요.');
       return;
     }
     onSubmit(modalContent);
@@ -54,13 +62,17 @@ export default function InputModal({
             autoFocus
             className='w-full px-3 py-2 border rounded-lg border-gray-200'
             name='name'
-            onChange={saveTodoName}
+            value={modalContent}
+            onChange={onChangeContent}
             onKeyDown={handleButtonPress}
           />
         </div>
         <div className='flex gap-2 justify-between'>
           <button
-            onClick={onClose}
+            onClick={() => {
+              onClose();
+              setModalContent('');
+            }}
             className='w-1/2 px-4 py-2 bg-white border-gray-200 border text-gray-600 font-medium rounded-lg'
           >
             취소

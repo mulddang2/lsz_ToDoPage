@@ -1,10 +1,11 @@
-import React from 'react';
-import { TTodo } from '../types/todo';
-import { MdOutlineCancelPresentation, MdOutlineEdit } from 'react-icons/md';
-import { useBoardStore } from '../stores/useBoardStore';
-import { ItemTypes } from './Board';
+import { useEffect, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { isNullOrEmpty } from '../util/stringUtil';
+import { useBoardStore } from '../stores/useBoardStore';
+import { TTodo } from '../types/todo';
+import { ItemTypes } from './Board';
+import Dropdown from './Dropdown';
+import InputModal from './InputModal';
+import { useDndStore } from '../stores/useDndStore';
 
 interface ITodo {
   todo: TTodo;
@@ -14,23 +15,18 @@ interface ITodo {
 
 export default function Todo({ todo, index, boardId }: ITodo) {
   const { removeTodo, editTodo, moveTodo } = useBoardStore();
+  const [isEditTodoModalOpen, setIsEditTodoModalOpen] = useState(false);
+  const [isHover, setIsHover] = useState(false);
+  const { isDraggable, setIsDraggable } = useDndStore();
 
-  const handleEditTodo = (boardId: string, todoId: string) => {
-    const newContent = prompt('변경할 할 일을 입력해주세요.') || '';
-    if (isNullOrEmpty(newContent)) {
-      alert('할 일을 여백으로 변경할 수 없습니다.');
-      return;
-    }
-    editTodo(boardId, todoId, newContent);
-  };
-
-  const handleDeleteTodo = (boardId: string, todoId: string) => {
-    removeTodo(boardId, todoId);
-  };
+  useEffect(() => {
+    setIsDraggable(!isEditTodoModalOpen);
+  }, [setIsDraggable, isEditTodoModalOpen]);
 
   const [{ isDragging }, drag] = useDrag({
     type: ItemTypes.TODO,
     item: { boardId: boardId, todoId: todo.id, todoIndex: index },
+    canDrag: isDraggable,
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -50,27 +46,42 @@ export default function Todo({ todo, index, boardId }: ITodo) {
     },
   });
 
+  const dropdownItems = [
+    {
+      text: '수정하기',
+      onClick: () => setIsEditTodoModalOpen(true),
+    },
+    {
+      text: '삭제하기',
+      onClick: () => removeTodo(boardId, todo.id),
+    },
+  ];
+
   return (
     <div
       ref={(node) => {
         drag(drop(node));
       }}
-      className={` cursor-move bg-white rounded-md p-3 mt-3 flex ${
+      className={`cursor-move bg-white rounded-md p-3 mt-3 flex justify-between gap-2 ${
         isDragging ? 'opacity-50' : 'opacity-100'
       }`}
       key={todo.id}
+      onMouseOver={() => setIsHover(true)}
+      onMouseLeave={() => setIsHover(false)}
     >
       <h5>{todo.content}</h5>
-      <div className='flex gap-2 '>
-        <MdOutlineEdit
-          onClick={() => handleEditTodo(boardId, todo.id)}
-          className='w-4 h-4 text-gray-500 cursor-pointer'
-        />
-        <MdOutlineCancelPresentation
-          onClick={() => handleDeleteTodo(boardId, todo.id)}
-          className='w-4 h-4 text-gray-500 cursor-pointer'
-        />
+      <div className={`${isHover ? 'visible' : 'invisible'}`}>
+        <Dropdown items={dropdownItems} />
       </div>
+
+      <InputModal
+        title='변경할 할 일을 입력해주세요.'
+        inputName='내용'
+        inputDefaultValue={todo.content}
+        isOpen={isEditTodoModalOpen}
+        onClose={() => setIsEditTodoModalOpen(false)}
+        onSubmit={(content: string) => editTodo(boardId, todo.id, content)}
+      />
     </div>
   );
 }
