@@ -4,6 +4,7 @@ import { MdOutlineAddBox, MdOutlineEdit } from 'react-icons/md';
 import { useBoardStore } from '../stores/useBoardStore';
 import { TBoard } from '../types/board';
 import Todo from './Todo';
+import { isNullOrEmpty } from '../util/stringUtil';
 
 interface BoardProps {
   index: number;
@@ -19,9 +20,9 @@ export default function Board({ board, index }: BoardProps) {
   const { addTodo, removeBoard, editBoard, moveBoard } = useBoardStore();
 
   const handleCreateTodo = (boardId: string) => {
-    const content = prompt('할 일을 입력해주세요.');
-    if (!content) {
-      alert('잘못된 할 일 입니다.');
+    const content = prompt('할 일을 입력해주세요.') || '';
+    if (isNullOrEmpty(content)) {
+      alert('할 일을 비워둘 수 없습니다.');
       return;
     }
     addTodo(boardId, content);
@@ -32,9 +33,9 @@ export default function Board({ board, index }: BoardProps) {
   };
 
   const handleEditBoard = (boardId: string) => {
-    const newName = prompt('변경할 보드 이름을 입력해주세요.');
-    if (!newName) {
-      alert('잘못된 보드 이름 입니다.');
+    const newName = prompt('변경할 보드 이름을 입력해주세요.') || '';
+    if (isNullOrEmpty(newName)) {
+      alert('보드 이름을 여백으로 변경할 수 없습니다.');
       return;
     }
     editBoard(boardId, newName);

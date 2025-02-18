@@ -6,14 +6,15 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { MdOutlineAddBox } from 'react-icons/md';
 import Board from '../components/Board';
 import { useBoardStore } from '../stores/useBoardStore';
+import { isNullOrEmpty } from '../util/stringUtil';
 
 export default function Home() {
   const { boardList, addBoard } = useBoardStore();
 
   const handleCreateBoard = () => {
-    const name = prompt('보드 이름을 입력해주세요.');
-    if (!name) {
-      alert('잘못된 보드 이름 입니다.');
+    const name = prompt('보드 이름을 입력해주세요.') || '';
+    if (isNullOrEmpty(name)) {
+      alert('보드명을 비워둘 수 없습니다.');
       return;
     }
     addBoard(name);
