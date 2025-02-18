@@ -1,10 +1,11 @@
+import { useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { IoTrashBinOutline } from 'react-icons/io5';
 import { MdOutlineAddBox, MdOutlineEdit } from 'react-icons/md';
 import { useBoardStore } from '../stores/useBoardStore';
 import { TBoard } from '../types/board';
+import InputModal from './InputModal';
 import Todo from './Todo';
-import { isNullOrEmpty } from '../util/stringUtil';
 
 interface BoardProps {
   index: number;
@@ -18,23 +19,17 @@ export const ItemTypes = {
 
 export default function Board({ board, index }: BoardProps) {
   const { addTodo, removeBoard, editBoard, moveBoard } = useBoardStore();
-
-  const handleCreateTodo = (boardId: string) => {
-    const content = prompt('할 일을 입력해주세요.') || '';
-    if (isNullOrEmpty(content)) {
-      alert('할 일을 비워둘 수 없습니다.');
-      return;
-    }
-    addTodo(boardId, content);
-  };
+  const [isCreateTodoModalOpen, setIsCreateTodoModalOpen] = useState(false);
 
   const handleDeleteBoard = (boardId: string) => {
     removeBoard(boardId);
   };
 
   const handleEditBoard = (boardId: string) => {
-    const newName = prompt('변경할 보드 이름을 입력해주세요.') || '';
-    if (isNullOrEmpty(newName)) {
+    const newName = prompt('변경할 보드 이름을 입력해주세요.');
+    if (newName === null) {
+      return;
+    } else if (newName.trim() === '') {
       alert('보드 이름을 여백으로 변경할 수 없습니다.');
       return;
     }
@@ -88,13 +83,20 @@ export default function Board({ board, index }: BoardProps) {
 
       <button
         onClick={() => {
-          handleCreateTodo(board.id);
+          setIsCreateTodoModalOpen(true);
         }}
         className='flex justify-center items-center mt-6 space-x-2 text-lg'
       >
         <span>Add task</span>
         <MdOutlineAddBox className='w-5 h-5 text-gray-500' />
       </button>
+      <InputModal
+        title='새로운 목록 생성'
+        inputName='내용'
+        isOpen={isCreateTodoModalOpen}
+        onClose={() => setIsCreateTodoModalOpen(false)}
+        onSubmit={(content: string) => addTodo(board.id, content)}
+      />
     </div>
   );
 }

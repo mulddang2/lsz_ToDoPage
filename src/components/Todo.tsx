@@ -60,11 +60,7 @@ export default function Todo({ todo, index, boardId }: ITodo) {
       }`}
       key={todo.id}
     >
-      <h5>
-        {typeof todo.content === 'string'
-          ? todo.content
-          : JSON.stringify(todo.content)}
-      </h5>
+      <h5>{todo.content}</h5>
       <div className='flex gap-2 '>
         <MdOutlineEdit
           onClick={() => handleEditTodo(boardId, todo.id)}
